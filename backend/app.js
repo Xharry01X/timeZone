@@ -1,28 +1,12 @@
-import { NTPClient } from './NTPserver.js';
+import express from "express"
 
-async function getTimeDifference() {
-    try {
-        const client = new NTPClient('time.google.com');
-        const ntpTime = await client.getNetworkTime();
+const app = express();
 
-        // Convert Date to local time string
-        const systemTime = new Date();
-        const systemTimeLocal = systemTime.toLocaleString();
-        const ntpTimeLocal = new Date(ntpTime).toLocaleString();
 
-        // Calculate time difference
-        const timeDiff = Math.abs(systemTime - ntpTime);
+app.get('/',(req,res) => {
 
-        console.log(`Current System Time: ${systemTimeLocal}`);
-        console.log(`Current NTP Time: ${ntpTimeLocal}`);
-        console.log(`Time Difference: ${timeDiff} milliseconds`);
-    } catch (error) {
-        console.error('Error occurred:', error.message);
-    }
-}
+    res.json({ time: new Date().toISOString()});
 
-// Run the function every 5 seconds
-setInterval(getTimeDifference, 5000);
+});
 
-// Initial call to start immediately
-getTimeDifference();
+app.listen(3000, ()=> console.log("Server running on port 3000"));
