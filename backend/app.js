@@ -1,18 +1,28 @@
-import { MyTimezone } from "./MyTimezone.js";
+import { NTPClient } from './NTPserver.js';
 
-const timezone = new MyTimezone();
+async function getTimeDifference() {
+    try {
+        const client = new NTPClient('time.google.com');
+        const ntpTime = await client.getNetworkTime();
 
-async function test() {
-  try {
-    const location = await timezone.getLocation('Varanasi, India');
-    const date = await timezone.getDateByAddress('Varanasi, India');
-    
-    console.log('Location:', location);
-    console.log('Date:', date);
-    console.log('Parsed Date:', timezone.parseDate(date));
-  } catch (error) {
-    console.error('An error occurred:', error);
-  }
+        // Convert Date to local time string
+        const systemTime = new Date();
+        const systemTimeLocal = systemTime.toLocaleString();
+        const ntpTimeLocal = new Date(ntpTime).toLocaleString();
+
+        // Calculate time difference
+        const timeDiff = Math.abs(systemTime - ntpTime);
+
+        console.log(`Current System Time: ${systemTimeLocal}`);
+        console.log(`Current NTP Time: ${ntpTimeLocal}`);
+        console.log(`Time Difference: ${timeDiff} milliseconds`);
+    } catch (error) {
+        console.error('Error occurred:', error.message);
+    }
 }
 
-test();
+// Run the function every 5 seconds
+setInterval(getTimeDifference, 5000);
+
+// Initial call to start immediately
+getTimeDifference();
